@@ -1,0 +1,142 @@
+services:
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+    ports:
+      - "9696:9696"
+    volumes:
+      - /mnt/user/appdata/prowlarr:/config
+    networks:
+      - media
+
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - JELLYFIN_PublishedServerUrl=${JELLYFIN_PUBLISHED_URL}
+    ports:
+      - "8096:8096"
+      - "8920:8920"
+      - "7359:7359/udp"
+      - "1900:1900/udp"
+    volumes:
+      - /mnt/user/appdata/jellyfin:/config
+      - /mnt/user/media/library:/data:ro
+    devices:
+      - /dev/dri:/dev/dri
+    networks:
+      - media
+
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+      - UMASK=${UMASK}
+    ports:
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
+    volumes:
+      - /mnt/user/appdata/qbittorrent:/config
+      - /mnt/user/media:/data #optional
+    networks:
+      - media
+
+  # sabnzbd:
+  #   image: lscr.io/linuxserver/sabnzbd:latest
+  #   container_name: sabnzbd
+  #   restart: unless-stopped
+  #   environment:
+  #     - PUID=${PUID}
+  #     - PGID=${PGID}
+  #     - TZ=${TZ}
+  #     - UMASK=${UMASK}
+  #   ports:
+  #     - '8081:8080'
+  #   volumes:
+  #     - /mnt/user/appdata/sabnzbd:/config
+  #     - /mnt/user/media/usenet:/data/usenet
+  #   networks:
+  #     - media
+
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    ports:
+      - "7878:7878"
+    volumes:
+      - /mnt/user/appdata/radarr:/config
+      - /mnt/user/media:/data
+    depends_on:
+      - prowlarr
+      - qbittorrent
+      # - sabnzbd
+    networks:
+      - media
+
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    ports:
+      - "8989:8989"
+    volumes:
+      - /mnt/user/appdata/sonarr:/config
+      - /mnt/user/media:/data
+    depends_on:
+      - prowlarr
+      - qbittorrent
+      # - sabnzbd
+    networks:
+      - media
+
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    restart: unless-stopped
+    environment:
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
+      - UMASK=${UMASK}
+    ports:
+      - "6767:6767"
+    volumes:
+      - /mnt/user/appdata/bazarr:/config
+      - /mnt/user/media:/data
+    depends_on:
+      - radarr
+      - sonarr
+    networks:
+      - media
+
+networks:
+  media:
+    name: media_net
+    driver: bridge

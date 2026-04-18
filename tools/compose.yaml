@@ -1,0 +1,25 @@
+services:
+  it-tools:
+    image: corentinth/it-tools:latest
+    container_name: it-tools
+    restart: unless-stopped
+    ports:
+      - "8088:80"
+    networks:
+      - tools
+
+  excalidraw:
+    image: excalidraw/excalidraw:latest
+    container_name: excalidraw
+    restart: unless-stopped
+    ports:
+      - "5000:80"
+    stdin_open: true
+    tty: true
+    networks:
+      - tools
+
+networks:
+  tools:
+    name: tools_net
+    driver: bridge

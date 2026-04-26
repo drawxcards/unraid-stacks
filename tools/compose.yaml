@@ -4,7 +4,7 @@ services:
     container_name: it-tools
     restart: unless-stopped
     ports:
-      - "8088:80"
+      - '8088:80'
     networks:
       - tools
 
@@ -13,11 +13,31 @@ services:
     container_name: excalidraw
     restart: unless-stopped
     ports:
-      - "5000:80"
+      - '5000:80'
     stdin_open: true
     tty: true
     networks:
       - tools
+
+  marreta:
+    container_name: marreta
+    image: manualdousuario/marreta:latest
+    ports:
+      - '80:80'
+    # volumes:
+    #   - ./app/cache:/app/cache
+    #   - ./app/logs:/app/logs
+    environment:
+      - SITE_NAME=${SITE_NAME:-Marreta}
+      - SITE_DESCRIPTION=${SITE_DESCRIPTION:-Marreta}
+      - SITE_URL=${SITE_URL:-http://localhost}
+      # - DNS_SERVERS=${DNS_SERVER:-1.1.1.1,8.8.8.8}
+      - LANGUAGE=${LANGUAGE:-en}
+      # - LOG_LEVEL=${LOG_LEVEL:-WARNING}
+      # - SELENIUM_HOST=${SELENIUM_HOST:-selenium-hub:4444}
+      # - CLEANUP_DAYS=7 # Optional
+      # - PROXY_LIST=url # Optional
+    restart: unless-stopped
 
 networks:
   tools:

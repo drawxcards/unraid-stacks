@@ -23,7 +23,7 @@ services:
     container_name: marreta
     image: manualdousuario/marreta:latest
     ports:
-      - '80:80'
+      - '8011:80'
     # volumes:
     #   - ./app/cache:/app/cache
     #   - ./app/logs:/app/logs
